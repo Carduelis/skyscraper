@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Skyscrapers</title>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.13.1/lodash.min.js"></script>
+	<script type="text/javascript" src="main.js"></script>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+	<style>
+		.puzzle .row {
+			margin: 0;
+			display: flex;
+			justify-content: center;
+		}
+		.cell {
+			width: 50px;
+			height: 50px;
+			margin: 5px;
+		}
+		.cell input {
+			height: 100%;
+			text-align: center;
+		}
+		.cell input[data-state="answer"] {
+			font-size: 40px;
+		}
+		.cell input[data-state="guess"] {
+			font-size: 20px;
+			color: #777;
+		}
+	</style>
+
+</head>
+
+<body>
+	<div class="container">
+	<h1>Hello, it's skyscrapers game!</h1>
+
+	<form name="steps">
+		<div class="steps" data-step="0">
+			<div class="row">
+				<div class="col-sm-6">
+					<div class="form-group">
+						<label for="exampleInputEmail1">Your name</label>
+						<input type="text" class="form-control" id="exampleInputEmail1" placeholder="First Name + Second Name">
+						<p class="help-block">Don't worry, it's absolutely private
+					</div>
+				</div>
+				<div class="col-sm-6">
+					<div class="form-group">
+						<label for="exampleInputEmail1">E-mail</label>
+						<input type="email" class="form-control" id="exampleInputEmail1" placeholder="mail@service.com">
+						<p class="help-block">We'll send your score later
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="steps" data-step="1">
+			<h4>You have only 10 minutes to solve the puzzle</h4>
+
+		</div>
+
+		<div class="steps" data-step="2">
+			<button class="btn btn-lg btn-success">Start!</button>
+		</div>
+
+		<div class="puzzle">
+
+		</div>
+	</form>
+	</div>
+</body>
+</html>
