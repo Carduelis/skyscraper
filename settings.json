@@ -3,11 +3,19 @@
 	"size": 7,
 	"boundary": [
 		{
-			"top": [1,4,3,2,4,5,7],
-			"right": [1,7,4,3,2,4,5],
-			"left": [1,7,4,3,2,4,5],
-			"bottom": [1,4,5,4,3,2,7]
+			"top": 		[1,4,3,2,4,5,7],
+			"right": 	[1,7,4,3,2,4,5],
+			"left":		[1,7,4,3,2,4,5],
+			"bottom": 	[1,4,5,4,3,2,7]
 		}
+	],
+	"default" : [
+		[null,	null,	null,	null,	null,	null,	null],
+		[null,	2	,	null,	null,	null,	null,	null],
+		[null,	null,	null,	3	,	null,	null,	null],
+		[null,	null,	null,	4	,	null,	null,	null],
+		[null,	3	,	null,	null,	null,	null,	null],
+		[null,	null,	null,	null,	null,	null,	null],
+		[null,	null,	null,	null,	2	,	null,	null]
 	]
-	
 }

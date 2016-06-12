@@ -20,17 +20,22 @@
 		.cell {
 			width: 50px;
 			height: 50px;
-			margin: 5px;
+			margin: 1px;
 		}
 		.cell input {
 			height: 100%;
 			text-align: center;
 		}
+		.cell input[data-state="default"],
 		.cell input[data-state="answer"] {
-			font-size: 40px;
+			font-size: 35px;
 		}
 		.cell input[data-state="guess"] {
 			font-size: 20px;
+			color: #777;
+		}
+		.cell input[data-state="guess-three"] {
+			font-size: 14px;
 			color: #777;
 		}
 	</style>
