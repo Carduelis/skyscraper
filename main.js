@@ -85,7 +85,11 @@ $(document).ready(function() {
 						contentType: false,
          				processData: false,
 					}).done(function(data){
-						console.log(data)
+						console.log(data);
+						$('.debug').html(JSON.stringify(data))
+					}).fail(function(data,text){
+						alert('Something went wrong: "', text, '" - see console for debug');
+						console.error(data);
 					})
 				break;
 				default:
