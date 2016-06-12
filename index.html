@@ -12,19 +12,80 @@
 	<!-- Latest compiled and minified JavaScript -->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 	<style>
+		.puzzle .row:before,
+		.puzzle .row:after {
+			display: none;
+		}
 		.puzzle .row {
 			margin: 0;
 			display: flex;
 			justify-content: center;
 		}
+		.puzzle .cell.hover {
+			opacity: 1 !important;
+		}
+		.puzzle .cell.hover input {
+			border-color: rgba(102, 175, 233, 0.75);
+
+		}
+		.puzzle .cell.hint {
+			opacity: .5;
+			position: relative;
+			line-height: 50px;
+		}
+		.puzzle .cell.hint.hover {
+		}
+		.puzzle .cell.hint.hover i {
+			color: rgba(0,0,0,.8);
+		}
+		.puzzle .cell.hint i {
+			position: absolute;
+			top:0;
+			left: 0;
+			z-index: 1;
+			font-size: 30px;
+			display: block;
+			text-align: center;
+			width: 50px;
+			line-height: 50px;
+			color: rgba(0,0,0,.2);
+		}
+		.puzzle .cell.hint span {
+			display: block;
+			position: relative;
+			z-index: 2;
+			text-shadow: 1px 1px 1px #fff,  -1px -1px 1px #fff,  -1px 1px 1px #fff,  1px -1px 1px #fff;
+			font-size: 200%;
+		}
+		.puzzle .cell.hint.left span {right: 30px;}
+		.puzzle .cell.hint.right span {left: 30px;}
+		.puzzle .cell.hint.top span {bottom: 30px;}
+		.puzzle .cell.hint.bottom span {top: 30px;}
 		.cell {
 			width: 50px;
 			height: 50px;
-			margin: 1px;
+			text-align: center;
+			transition: all 300ms;
+			background-color: #eee;
+			position: relative;
+			z-index: 2;
+			padding: 3px;
+		}
+		.cell.hint {
+			z-index: 1;
+			box-shadow: 0 0  40px 10px #eee;
 		}
 		.cell input {
+			box-shadow: none;
 			height: 100%;
+			padding: 0;
+			line-height: 48px;
 			text-align: center;
+			cursor: pointer;
+			border-color: rgba(20,20,20,.2);
+		}
+		.cell input:focus {
+			cursor: text;
 		}
 		.cell input[data-state="default"],
 		.cell input[data-state="answer"] {
@@ -38,6 +99,9 @@
 			font-size: 14px;
 			color: #777;
 		}
+
+
+
 	</style>
 
 </head>
@@ -71,13 +135,16 @@
 		</div>
 
 		<div class="steps" data-step="2">
-			<button class="btn btn-lg btn-success">Start!</button>
+			<button type="button" class="btn btn-lg btn-success">Start!</button>
 		</div>
-
+	</form>
+	<form name="puzzle">
 		<div class="puzzle">
 
 		</div>
+	
+	<button type="submit" class="btn btn-lg btn-success">Check it!</button>
+	<p class="help-block">You should fill all fields before checking.</p>   
 	</form>
-	</div>
 </body>
 </html>
