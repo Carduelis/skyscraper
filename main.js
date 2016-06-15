@@ -15,8 +15,57 @@ function setSymbolSize($el) {
 			break;
 	}
 }
+var startTime = 0;
+var pauseTime = 0;
+var pauseTimeStart = 0;
+var pauseTimeEnd = 0;
+var resumeTime = 0;
+function setStartTime() {	
+	startTime = localStorage['startTime'];
+	if (!startTime) {
+		localStorage['startTime'] = new Date().getTime();
+		startTime = localStorage['startTime'];
+	} 
+}
+
+function showTime(){
+	overalTime = {
+		ms : new Date().getTime() - startTime - pauseTime,
+		get seconds() {
+			return this.ms/1000;
+		},
+		get minutes() {
+			return Math.floor(this.seconds/60)
+		},
+		get secondsInTheMinute() {
+			return Math.floor(this.seconds - this.minutes*60);
+		},
+		get printMinutes() {
+			return (this.minutes < 10) ? '0'+this.minutes : this.minutes;
+		},
+		get printSeconds() {
+			return (this.secondsInTheMinute < 10) ? '0'+this.secondsInTheMinute : this.secondsInTheMinute;
+		}
+	};
+
+	$('input[name="minutes"]').val(overalTime.printMinutes);
+	$('input[name="seconds"]').val(overalTime.printSeconds);
+
+}
+
+function timeIsUp() {
+	$('.timer').css('color', 'red');
+	send(document.forms.puzzle);
+	$('.puzzle').slideUp(function(){
+			$('#timeIsUp').slideDown();
+	});
+}
+
+var timeInterval;
 $(document).ready(function() {
 	$puzzle = $('.puzzle');
+
+
 	$.ajax({
 		method: 'GET',
 		url: 'settings.json',
@@ -55,6 +104,17 @@ $(document).ready(function() {
 			}
 
 
+	
+
+
+	}).fail(function(data, a){
+		alert(a + ', see console')
+		console.error(data);
+
+
+
+	})
+
 		$puzzle.on('input', 'input', function(){
 			setSymbolSize($(this));
 		})
@@ -69,18 +129,67 @@ $(document).ready(function() {
 			}
 		})
 
+		$(document).on('click', 'button', function(e){
+			switch (this.name) {
+				case 'start' :
+					setStartTime();
+					timeInterval = setInterval(function() {
+						showTime();
+					}, 1000);
+
+				break;
+				case 'skip' :
+					clearInterval(timeInterval)
+					timeIsUp();
+				break;
+				case 'pause' :
+					pauseTimeStart = new Date().getTime();
+					clearInterval(timeInterval);
+					$puzzle.fadeOut();
+				break;
+				case 'play' :
+					setStartTime();
+					pauseTimeEnd = new Date().getTime();
+					pauseTime = pauseTimeStart ? pauseTimeEnd - pauseTimeStart : 0;
+					timeInterval = setInterval(function() {
+						showTime(pauseTime);
+					}, 1000);
+					$puzzle.fadeIn();
+				break;
+				case 'clear' :
+					localStorage['startTime'] = new Date().getTime();
+					setStartTime();
+				break;
+				case 'stop' :
+					clearInterval(timeInterval);
+					$('input[name="minutes"]').val('00');
+					$('input[name="seconds"]').val('00');
+					localStorage['startTime'] = new Date().getTime();
+				break;
+			}
+		});
 		$(document).on('submit', 'form', function(e){
 			e.preventDefault();
 			switch (this.name) {
-				case 'steps' :
-					alert('coming soon')
+				case 'start' :
+
 				break;
 				case 'puzzle' :
-					var data = new FormData(this);
-					$.ajax({
+					send(this)
+				break;
+				default:
+					alert('Unnoticed form')
+				break;
+			}
+			return false;
+		})
+})
+
+function send(form) {
+	$.ajax({
 						type: 'POST',
 						url: 'checker.php',
-						data: data,
+						data: new FormData(form),
 						dataType: 'json',
 						contentType: false,
          				processData: false,
@@ -91,21 +200,4 @@ $(document).ready(function() {
 						alert('Something went wrong: "', text, '" - see console for debug');
 						console.error(data);
 					})
-				break;
-				default:
-					alert('Unnoticed form')
-				break;
-			}
-			return false;
-		})
-
-
-	}).fail(function(data, a){
-		alert(a + ', see console')
-		console.error(data);
-
-
-
-	})
-
-})
+}
