@@ -1,6 +1,6 @@
 // vars
 var areRequiredInputs = true,
-	maxTime = 4; // minutes
+	maxTime = 4; // in minutes
 
 var timer;
 var newTry = true;
@@ -82,6 +82,21 @@ Timer.prototype.end = function() {
 	$('.puzzle').slideUp(function(){
 		$('#timeIsUp').slideDown();
 	});
+}
+
+Timer.prototype.success = function() {
+	this.stop();
+	$('.timer').css('color', 'green');
+	$('.puzzle').slideUp(function(){
+		$('#success').slideDown();
+	});
+}
+Timer.prototype.failure = function(text) {
+	$('#failure .response').text(text)
+	$('#failure').slideDown();
+	setTimeout(function (argument) {
+		$('#failure').slideUp();
+	}, 2000)
 }
 
 
@@ -213,11 +228,11 @@ function answer(form) {
 	}).done(function(data){
 		console.log(data);
 		if (data.result === true) {
-			timer.stop()
+			timer.success();
 		} else {
 			console.error('result should be true and boolean!');
 			console.error('Type of result is '+ typeof data.result + '. Value of result is '+ data.result);
-			alert(data.result)
+			timer.failure(data.result);
 		}
 	}).fail(function(data,text){
 		alert('Something went wrong: "' + text + '" - see console for debug');
