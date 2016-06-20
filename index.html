@@ -114,28 +114,37 @@
 			width: 70px;
 			text-align: right;
 		}
+		.timer input.ms {
+			display: inline-block;
+			width: 70px;
+			text-align: left;
+			font-size: 50%;
+			vertical-align: top;
+			opacity: .6;
+		}
 
 	</style>
 
 </head>
 
 <body>
-	<div class="container">
+	<div class="container text-center">
 	<h1>Hello, it's skyscrapers game!</h1>
+	<h4>You have only 30 minutes to solve the puzzle</h4>
 
-	<form name="start">
+	<form name="start" class="hide">
+		<!-- This form is not nessesary so it's hidden -->
 		<div class="steps" data-step="1">
-			<h4>You have only 10 minutes to solve the puzzle</h4>
 		</div>
 		<div class="steps" data-step="2">
 		</div>
 		<button type="button" name="start" class="btn btn-lg btn-success">Start!</button>
 		<button type="button" name="skip" class="btn btn-sm btn-default">SkipTime</button>
-			<div class="btn-group">
-		<button type="button" name="play" class="btn btn-sm btn-success"><i class="glyphicon glyphicon-play"></i> </button>
-		<button type="button" name="pause" class="btn btn-sm btn-warning"><i class="glyphicon glyphicon-pause"></i> </button>
-		<button type="button" name="stop" class="btn btn-sm btn-danger"><i class="glyphicon glyphicon-stop"></i></button>
-		<button type="button" name="clear" class="btn btn-sm btn-info"><i class="glyphicon glyphicon-repeat"></i></button>
+		<div class="btn-group ">
+			<button type="button" name="play" class="btn btn-sm btn-success"><i class="glyphicon glyphicon-play"></i> </button>
+			<button type="button" name="pause" class="btn btn-sm btn-warning"><i class="glyphicon glyphicon-pause"></i> </button>
+			<button type="button" name="stop" class="btn btn-sm btn-danger"><i class="glyphicon glyphicon-stop"></i></button>
+			<button type="button" name="clear" class="btn btn-sm btn-info"><i class="glyphicon glyphicon-repeat"></i></button>
 		</div>
 	</form>
 
@@ -150,12 +159,11 @@
 			<p class='text-muted small'>Data transferred now, please do not close the window. Thank you
 		</div>
 		<div class="puzzle">
-
+			<!-- space for render of the puzzle -->
 		</div>
 	
-			<button type="submit" class="btn btn-lg btn-success">Check it!</button>
-			<p class="help-block">You should fill all fields before checking.</p>   
-			<code class="debug"></code>
+		<button type="submit" class="btn btn-lg btn-success">Check it!</button>
+		<p class="help-block">You should fill all fields before checking.</p>
 	</form>
 </body>
 </html>

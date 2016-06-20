@@ -1,3 +1,9 @@
+// vars
+var areRequiredInputs = true,
+	maxTime = 4; // minutes
+
+var timer;
+var newTry = true;
 function setSymbolSize($el) {
 	console.log($el.val(),$el.val().length)
 	switch ($el.val().length) {
@@ -15,22 +21,15 @@ function setSymbolSize($el) {
 			break;
 	}
 }
-var startTime = 0;
-var pauseTime = 0;
-var pauseTimeStart = 0;
-var pauseTimeEnd = 0;
-var resumeTime = 0;
-function setStartTime() {	
-	startTime = localStorage['startTime'];
-	if (!startTime) {
-		localStorage['startTime'] = new Date().getTime();
-		startTime = localStorage['startTime'];
-	} 
-}
 
-function showTime(){
-	overalTime = {
-		ms : new Date().getTime() - startTime - pauseTime,
+
+
+function Timer(options) {
+	this.interval = false;
+	this.time = {
+		get ms() {
+			return new Date().getTime() - localStorage['startTime'];
+		},
 		get seconds() {
 			return this.ms/1000;
 		},
@@ -39,39 +38,61 @@ function showTime(){
 		},
 		get secondsInTheMinute() {
 			return Math.floor(this.seconds - this.minutes*60);
-		},
-		get printMinutes() {
-			return (this.minutes < 10) ? '0'+this.minutes : this.minutes;
-		},
-		get printSeconds() {
-			return (this.secondsInTheMinute < 10) ? '0'+this.secondsInTheMinute : this.secondsInTheMinute;
 		}
-	};
-
-	$('input[name="minutes"]').val(overalTime.printMinutes);
-	$('input[name="seconds"]').val(overalTime.printSeconds);
+	}
 
 }
 
-function timeIsUp() {
+Timer.prototype.leftPad = function(num) {
+	return (num < 10) ? '0' + num : num
+}
+
+Timer.prototype.reset = function() {
+	localStorage['startTime'] = new Date().getTime();
+	return this
+}
+Timer.prototype.tick = function() {
+	newTry = false;
+	var self = this;
+	this.interval = setInterval(function() {
+		self.print();
+		if (self.time.ms > maxTime*60*1000) {
+			self.end();
+		}
+	}, 1000);
+}
+
+Timer.prototype.stop = function() {
+	newTry = true;
+	clearInterval(this.interval)
+}
+Timer.prototype.print = function() {
+	if (this.time.ms % 13 == 0) {
+		// just joke
+		console.log('now:', this.time.ms,'ms; max:',maxTime*60*1000,'ms');
+	}
+	$('input[name="minutes"]').val(this.leftPad(this.time.minutes));
+	$('input[name="seconds"]').val(this.leftPad(this.time.secondsInTheMinute));
+}
+
+Timer.prototype.end = function() {
+	this.stop();
 	$('.timer').css('color', 'red');
-	send(document.forms.puzzle);
+	answer(document.forms.puzzle);
 	$('.puzzle').slideUp(function(){
-			$('#timeIsUp').slideDown();
+		$('#timeIsUp').slideDown();
 	});
 }
 
-var timeInterval;
+
 $(document).ready(function() {
 	$puzzle = $('.puzzle');
-
-
+	timer = new Timer();
 	$.ajax({
 		method: 'GET',
 		url: 'settings.json',
 		dataType: 'json'
 	}).done(function(data){
-
 		for (var i = 0; i < data.size; i++) {
 			$puzzle.append('<div class="row" data-row="'+i+'">')
 				$row = $puzzle.find('.row[data-row="'+i+'"]')
@@ -80,6 +101,9 @@ $(document).ready(function() {
 				var inputValue = data.default[i][j] ? data.default[i][j] : '';
 				var html = '<div class="cell" data-row="'+i+'" data-col="'+j+'" >';
 				var input =	'<input type="text" class="form-control"  ';
+				if (areRequiredInputs) {
+					input += ' required '
+				}
 				if (inputValue) {
 					input+=	' data-state="default" readonly value="'+inputValue+'" ';
 				}
@@ -98,21 +122,18 @@ $(document).ready(function() {
 
 		$puzzle.append('<div class="row hint" data-row="bottom">');
 		$rowHintBottom = $puzzle.find('.hint[data-row="bottom"]');
-			for (var i = 0; i < data.size; i++) {
-				$rowHintTop.append('<div class="cell hint top" data-row="top" data-col="'+i+'"><i class="glyphicon glyphicon-menu-down"></i><span>'+data.boundary.top[i]+'</span></div>')
-				$rowHintBottom.append('<div class="cell hint bottom" data-row="bottom" data-col="'+i+'"><i class="glyphicon glyphicon-menu-up"></i><span>'+data.boundary.bottom[i]+'</span></div>')
-			}
-
-
-	
-
+		for (var i = 0; i < data.size; i++) {
+			$rowHintTop.append('<div class="cell hint top" data-row="top" data-col="'+i+'"><i class="glyphicon glyphicon-menu-down"></i><span>'+data.boundary.top[i]+'</span></div>')
+			$rowHintBottom.append('<div class="cell hint bottom" data-row="bottom" data-col="'+i+'"><i class="glyphicon glyphicon-menu-up"></i><span>'+data.boundary.bottom[i]+'</span></div>')
+		}
+		if (newTry) {
+			timer.reset();
+		}
+		timer.tick();
 
 	}).fail(function(data, a){
 		alert(a + ', see console')
 		console.error(data);
-
-
-
 	})
 
 		$puzzle.on('input', 'input', function(){
@@ -122,8 +143,8 @@ $(document).ready(function() {
 		$puzzle.on('mouseover', '.cell', function(){
 			$('.cell').removeClass('hover')
 			if (!isNaN(Number(this.dataset.row)) && !isNaN(Number(this.dataset.col))) {
-				console.log(this.dataset.row, this.dataset.col)
-				console.log(_.isNumber(Number(this.dataset.row)), _.isNumber(Number(this.dataset.col)))
+				// console.log(this.dataset.row, this.dataset.col)
+				// console.log(_.isNumber(Number(this.dataset.row)), _.isNumber(Number(this.dataset.col)))
 				$('.cell[data-row="'+this.dataset.row+'"').addClass('hover')
 				$('.cell[data-col="'+this.dataset.col+'"').addClass('hover')
 			}
@@ -132,10 +153,6 @@ $(document).ready(function() {
 		$(document).on('click', 'button', function(e){
 			switch (this.name) {
 				case 'start' :
-					setStartTime();
-					timeInterval = setInterval(function() {
-						showTime();
-					}, 1000);
 
 				break;
 				case 'skip' :
@@ -175,7 +192,7 @@ $(document).ready(function() {
 
 				break;
 				case 'puzzle' :
-					send(this)
+					answer(this);
 				break;
 				default:
 					alert('Unnoticed form')
@@ -185,19 +202,25 @@ $(document).ready(function() {
 		})
 })
 
-function send(form) {
+function answer(form) {
 	$.ajax({
-						type: 'POST',
-						url: 'checker.php',
-						data: new FormData(form),
-						dataType: 'json',
-						contentType: false,
-         				processData: false,
-					}).done(function(data){
-						console.log(data);
-						$('.debug').html(JSON.stringify(data))
-					}).fail(function(data,text){
-						alert('Something went wrong: "', text, '" - see console for debug');
-						console.error(data);
-					})
+		type: 'POST',
+		url: 'checker.php',
+		data: new FormData(form),
+		dataType: 'json',
+		contentType: false,
+		processData: false,
+	}).done(function(data){
+		console.log(data);
+		if (data.result === true) {
+			timer.stop()
+		} else {
+			console.error('result should be true and boolean!');
+			console.error('Type of result is '+ typeof data.result + '. Value of result is '+ data.result);
+			alert(data.result)
+		}
+	}).fail(function(data,text){
+		alert('Something went wrong: "' + text + '" - see console for debug');
+		console.error(data);
+	})
 }
