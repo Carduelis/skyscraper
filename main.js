@@ -102,6 +102,7 @@ Timer.prototype.failure = function(text) {
 
 $(document).ready(function() {
 	$puzzle = $('.puzzle');
+	$('#allowedTime').text(maxTime)
 	timer = new Timer();
 	$.ajax({
 		method: 'GET',
