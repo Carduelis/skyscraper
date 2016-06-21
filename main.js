@@ -106,7 +106,10 @@ $(document).ready(function() {
 	timer = new Timer();
 	$.ajax({
 		method: 'GET',
-		url: 'settings.json',
+		url: 'settings.php',
+		data: {
+			setting: window.location.hash.slice(1)
+		},
 		dataType: 'json'
 	}).done(function(data){
 		for (var i = 0; i < data.size; i++) {
