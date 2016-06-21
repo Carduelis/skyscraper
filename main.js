@@ -1,9 +1,11 @@
 // vars
 var areRequiredInputs = true,
-	maxTime = 4; // in minutes
+	maxTime = 1.5; // in minutes
 
 var timer;
-var newTry = true;
+if (typeof localStorage['newTry'] === 'undefined') {
+	localStorage['newTry'] = 'yes';
+}
 function setSymbolSize($el) {
 	console.log($el.val(),$el.val().length)
 	switch ($el.val().length) {
@@ -52,7 +54,7 @@ Timer.prototype.reset = function() {
 	return this
 }
 Timer.prototype.tick = function() {
-	newTry = false;
+	localStorage['newTry'] = 'no';
 	var self = this;
 	this.interval = setInterval(function() {
 		self.print();
@@ -63,7 +65,7 @@ Timer.prototype.tick = function() {
 }
 
 Timer.prototype.stop = function() {
-	newTry = true;
+	localStorage['newTry'] = 'yes';
 	clearInterval(this.interval)
 }
 Timer.prototype.print = function() {
@@ -145,7 +147,7 @@ $(document).ready(function() {
 			$rowHintTop.append('<div class="cell hint top" data-row="top" data-col="'+i+'"><i class="glyphicon glyphicon-menu-down"></i><span>'+data.boundary.top[i]+'</span></div>')
 			$rowHintBottom.append('<div class="cell hint bottom" data-row="bottom" data-col="'+i+'"><i class="glyphicon glyphicon-menu-up"></i><span>'+data.boundary.bottom[i]+'</span></div>')
 		}
-		if (newTry) {
+		if (localStorage['newTry'] == 'yes') {
 			timer.reset();
 		}
 		timer.tick();
