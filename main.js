@@ -1,8 +1,9 @@
 // vars
-var areRequiredInputs = true,
+var areRequiredInputs = false,
 	maxTime = 1.5; // in minutes
 
 var timer;
+var actions = [];
 if (typeof localStorage['newTry'] === 'undefined') {
 	localStorage['newTry'] = 'yes';
 }
@@ -23,7 +24,6 @@ function setSymbolSize($el) {
 			break;
 	}
 }
-
 
 
 function Timer(options) {
@@ -101,6 +101,41 @@ Timer.prototype.failure = function(text) {
 	}, 2000)
 }
 
+function renderPuzzle($el, model, id) {		
+	for (var i = 0; i < model.size; i++) {
+		$el.append('<div class="row" data-row="'+i+'">')
+			$row = $el.find('.row[data-row="'+i+'"]')
+
+		for (var j = 0; j < model.size; j++) {
+			var inputValue = model.default[i][j] ? model.default[i][j] : '';
+			var html = '<div class="cell" data-row="'+i+'" data-col="'+j+'" >';
+			var input =	'<input type="text" class="form-control"  ';
+			if (areRequiredInputs) {
+				input += ' required '
+			}
+			if (inputValue) {
+				input+=	' data-state="default" readonly value="'+inputValue+'" ';
+			}
+				input+= 'name="cell['+id+']['+i+']['+j+']" >';
+			html+= input
+			html+= '</div>';
+
+			$row.append(html);
+		}
+		$row.prepend('<div class="cell hint left" data-row="'+i+'" data-col="left"><i class="glyphicon glyphicon-menu-right"></i><span>'+model.boundary.left[i]+'</span></div>')
+		$row.append('<div class="cell hint right" data-row="'+i+'" data-col="right"><i class="glyphicon glyphicon-menu-left"></i><span>'+model.boundary.right[i]+'</span></div>')
+
+	}
+	$el.prepend('<div class="row hint" data-row="top">');
+	$rowHintTop = $el.find('.hint[data-row="top"]');
+
+	$el.append('<div class="row hint" data-row="bottom">');
+	$rowHintBottom = $el.find('.hint[data-row="bottom"]');
+	for (var i = 0; i < model.size; i++) {
+		$rowHintTop.append('<div class="cell hint top" data-row="top" data-col="'+i+'"><i class="glyphicon glyphicon-menu-down"></i><span>'+model.boundary.top[i]+'</span></div>')
+		$rowHintBottom.append('<div class="cell hint bottom" data-row="bottom" data-col="'+i+'"><i class="glyphicon glyphicon-menu-up"></i><span>'+model.boundary.bottom[i]+'</span></div>')
+	}
+}
 
 $(document).ready(function() {
 	$puzzle = $('.puzzle');
@@ -114,38 +149,20 @@ $(document).ready(function() {
 		},
 		dataType: 'json'
 	}).done(function(data){
-		for (var i = 0; i < data.size; i++) {
-			$puzzle.append('<div class="row" data-row="'+i+'">')
-				$row = $puzzle.find('.row[data-row="'+i+'"]')
-
-			for (var j = 0; j < data.size; j++) {
-				var inputValue = data.default[i][j] ? data.default[i][j] : '';
-				var html = '<div class="cell" data-row="'+i+'" data-col="'+j+'" >';
-				var input =	'<input type="text" class="form-control"  ';
-				if (areRequiredInputs) {
-					input += ' required '
-				}
-				if (inputValue) {
-					input+=	' data-state="default" readonly value="'+inputValue+'" ';
-				}
-					input+= 'name="cell['+i+']['+j+']" >';
-				html+= input
-				html+= '</div>';
-
-				$row.append(html);
+		if (data.length) {
+			$puzzle.append('<ul class="nav nav-tabs" role="tablist">');
+			$puzzle.$tabs = $puzzle.children('ul.nav');
+			$puzzle.append('<div class="tab-content">');
+			$puzzle.$content = $puzzle.children('div.tab-content')
+			for (var p in data) {
+				$puzzle.$tabs.append('<li role="presentation"><a href="#puzzle'+p+'" aria-controls="home" role="tab" data-toggle="tab">Puzzle #'+(+p+1)+'</a></li>');
+				$puzzle.$content.append('<div role="tabpanel" class="tab-pane fade" id="puzzle'+p+'"></div>');
+				renderPuzzle($puzzle.$content.children('#puzzle'+p), data[p], p);
 			}
-			$row.prepend('<div class="cell hint left" data-row="'+i+'" data-col="left"><i class="glyphicon glyphicon-menu-right"></i><span>'+data.boundary.left[i]+'</span></div>')
-			$row.append('<div class="cell hint right" data-row="'+i+'" data-col="right"><i class="glyphicon glyphicon-menu-left"></i><span>'+data.boundary.right[i]+'</span></div>')
-
-		}
-		$puzzle.prepend('<div class="row hint" data-row="top">');
-		$rowHintTop = $puzzle.find('.hint[data-row="top"]');
-
-		$puzzle.append('<div class="row hint" data-row="bottom">');
-		$rowHintBottom = $puzzle.find('.hint[data-row="bottom"]');
-		for (var i = 0; i < data.size; i++) {
-			$rowHintTop.append('<div class="cell hint top" data-row="top" data-col="'+i+'"><i class="glyphicon glyphicon-menu-down"></i><span>'+data.boundary.top[i]+'</span></div>')
-			$rowHintBottom.append('<div class="cell hint bottom" data-row="bottom" data-col="'+i+'"><i class="glyphicon glyphicon-menu-up"></i><span>'+data.boundary.bottom[i]+'</span></div>')
+			$puzzle.$content.children().eq(0).addClass('active').addClass('in');
+			$puzzle.$tabs.children().eq(0).addClass('active');
+		} else {
+			renderPuzzle($puzzle, data, 0);
 		}
 		if (localStorage['newTry'] == 'yes') {
 			timer.reset();
@@ -157,8 +174,20 @@ $(document).ready(function() {
 		console.error(data);
 	})
 
-		$puzzle.on('input', 'input', function(){
+		$puzzle.on('click', '[data-toggle="tab"]', function(e){
+			actions.push({
+				action: 'switching',
+				time: timer.time.ms
+			})
+		});
+		$puzzle.on('input', 'input', function(e){
 			setSymbolSize($(this));
+			actions.push({
+				action: e.type,
+				value: this.value,
+				time: timer.time.ms,
+				target: e.target.name
+			})
 		})
 
 		$puzzle.on('mouseover', '.cell', function(){
@@ -224,10 +253,12 @@ $(document).ready(function() {
 })
 
 function answer(form) {
+	var puzzleData = new FormData(form);
+	puzzleData.append('actions',JSON.stringify(actions));
 	$.ajax({
 		type: 'POST',
 		url: 'checker.php',
-		data: new FormData(form),
+		data: puzzleData,
 		dataType: 'json',
 		contentType: false,
 		processData: false,

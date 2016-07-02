@@ -121,7 +121,14 @@
 			vertical-align: top;
 			opacity: .6;
 		}
-
+		.nav-tabs {
+			margin-bottom: 50px;
+		}	
+		.nav-tabs li {
+			display: inline-block;
+			vertical-align: top;
+			float: none;
+		}
 	</style>
 
 </head>
@@ -148,6 +155,7 @@
 	</form>
 
 	<form name="puzzle">
+		<input name="switchings" type="hidden">
 		<div class="timer">
 		<input type="text" readonly name="minutes" value="00">:<input type="text" readonly name="seconds" value="00">
 		</div>
