@@ -101,6 +101,21 @@ Timer.prototype.failure = function(text) {
 	}, 2000)
 }
 
+function disableF5(e) { 
+	if ((e.which || e.keyCode) == 116 || (e.which || e.keyCode) == 82) { 
+		e.preventDefault(); 
+		var reloadText = prompt('For reloading page, text here "yes"', '');
+		if (reloadText == 'yes') {
+			window.location.reload();
+		}
+	}
+};
+
+$(document).ready(function(){
+     $(document).on("keydown", disableF5);
+
+
+});
 function renderPuzzle($el, model, id) {		
 	for (var i = 0; i < model.size; i++) {
 		$el.append('<div class="row" data-row="'+i+'">')
