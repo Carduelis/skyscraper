@@ -81,17 +81,16 @@ Timer.prototype.end = function() {
 	this.stop();
 	$('.timer').css('color', 'red');
 	answer(document.forms.puzzle);
-	$('.puzzle').slideUp(function(){
-		$('#timeIsUp').slideDown();
-	});
+	$('#timeIsUp').slideDown();
+	$('.puzzle input').attr('disabled','disabled')
+	$('.puzzle').addClass('done');
 }
 
 Timer.prototype.success = function() {
 	this.stop();
 	$('.timer').css('color', 'green');
-	$('.puzzle').slideUp(function(){
-		$('#success').slideDown();
-	});
+	$('#success').slideDown();
+	$('.puzzle').addClass('done');
 }
 Timer.prototype.failure = function(text) {
 	$('#failure .response').text(text)
